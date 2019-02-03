@@ -5,11 +5,11 @@ import ntpath
 
 ###Access Temporary Credentials###
 
-print 'Using Boto Version ' + boto3.__version__
+print 'Using Boto3 Version ' + boto3.__version__
 
 sts_client = boto3.client('sts')
 
-print sts_client.get_caller_identity()
+print 'with following credentials: \n' + str(sts_client.get_caller_identity()) + '\n\n'
 
 assumed_role_object = sts_client.assume_role(RoleArn="arn:aws:iam::212162526483:role/S3FullAccessRole",
 	RoleSessionName="Session1"
@@ -60,16 +60,6 @@ elif(os.path.isdir(upload_path)):
 
 	rootTrigger = True;
 
-	# for root, dirs, files in os.walk(upload_path):
-	# 	if(rootTrigger == True):
-	# 		firstRootName = path_leaf(root)
-	# 		rootTrigger = False
-	# 	for file in files:
-	# 		if(upload_name == ''):
-	# 			s3.meta.client.upload_file(str(os.path.join(root, file)), 'cf-privatebucket01', firstRootName + '/' + file)
-	# 		else:
-	# 			s3.meta.client.upload_file(str(os.path.join(root, file)), 'cf-privatebucket01', upload_name + '/' + file)
-
 	for root, dirs, files in os.walk(upload_path):
 		if(rootTrigger == True):
 			firstRootName = path_leaf(root)
@@ -104,5 +94,16 @@ else:
 			# print dirs
 			# print '###FILES###'
 			# print files
+
+
+	# for root, dirs, files in os.walk(upload_path):
+	# 	if(rootTrigger == True):
+	# 		firstRootName = path_leaf(root)
+	# 		rootTrigger = False
+	# 	for file in files:
+	# 		if(upload_name == ''):
+	# 			s3.meta.client.upload_file(str(os.path.join(root, file)), 'cf-privatebucket01', firstRootName + '/' + file)
+	# 		else:
+	# 			s3.meta.client.upload_file(str(os.path.join(root, file)), 'cf-privatebucket01', upload_name + '/' + file)
 
 ###############
