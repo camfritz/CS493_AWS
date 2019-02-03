@@ -5,7 +5,7 @@ import ntpath
 
 ###Access Temporary Credentials###
 
-print boto3.__version__
+print 'Using Boto Version ' + boto3.__version__
 
 sts_client = boto3.client('sts')
 
@@ -29,8 +29,12 @@ s3 = boto3.resource(
 
 ###Helper function to get only file name from path###
 def path_leaf(path):
-	head, tail = ntpath.split(path)
-	return tail or ntpath.basename(head)
+	head, tail = os.path.split(path)
+	return tail or os.path.basename(head)
+
+def path_head(path):
+	head, tail = os.path.split(path)
+	return head
 
 #Get the file/folder upload path
 
@@ -41,17 +45,38 @@ else:
 
 #Determine if path is a file or folder and if it exists
 if(os.path.isfile(upload_path)):
-	#if path is a file, upload to s3 with option to rename file
-	upload_name = raw_input('Enter upload name of file (Leave blank to keep file name when uploading)')
+	#if path is a file, upload to s3 with option to rename file/storage path
+	upload_name = raw_input('Enter upload name of file. (blank = original)')
 	upload_target = path_leaf(upload_path)
 
 	if(upload_name == ''):
-		s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', str(upload_target))
+		s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', 'songs/' + str(upload_target))
 	else:
-		s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', str(upload_name))
+		s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', 'songs/' + str(upload_name))
 
 elif(os.path.isdir(upload_path)):
-	print ('Path is a folder')
+	#if path is a folder, upload all objects in folder to s3 with option to rename folder and/or storage path
+	upload_name = raw_input('Enter upload name of album/artist. (blank = original)')
+
+	rootTrigger = True;
+
+	# for root, dirs, files in os.walk(upload_path):
+	# 	if(rootTrigger == True):
+	# 		firstRootName = path_leaf(root)
+	# 		rootTrigger = False
+	# 	for file in files:
+	# 		if(upload_name == ''):
+	# 			s3.meta.client.upload_file(str(os.path.join(root, file)), 'cf-privatebucket01', firstRootName + '/' + file)
+	# 		else:
+	# 			s3.meta.client.upload_file(str(os.path.join(root, file)), 'cf-privatebucket01', upload_name + '/' + file)
+
+	for root, dirs, files in os.walk(upload_path):
+		if(rootTrigger == True):
+			firstRootName = path_leaf(root)
+			firstHeadName = path_head(root)
+			rootTrigger = False
+		for file in files:
+			print os.path.join(root[len(firstHeadName) + 1:], file)
 else:
 	print('invalid path or file does not exist')
 
@@ -59,5 +84,22 @@ else:
 
 # for bucket in s3.buckets.all():
 # 	print(bucket.name)
+
+		# for root, dirs, files in os.walk(upload_path):
+		# 	for name in files:
+		# 		if(os.path.isfile(os.path.join(root, name))):
+		# 			print os.path.join(name)
+
+			# if(upload_name == ''):
+	# 	for item in os.listdir(upload_path):
+	# 		if(os.path.isfile(os.path.join(upload_path, item))):
+	# 			print path_leaf(upload_path) + '/' + item
+
+				# print '\n###ROOT###'
+			# print root
+			# print '####DIRS###'
+			# print dirs
+			# print '###FILES###'
+			# print files
 
 ###############
