@@ -40,23 +40,34 @@ def path_head(path):
 
 if(len(sys.argv) <= 1):
 	upload_path = raw_input('Enter a file or file path for upload:')
-else:
+elif(len(sys.argv) == 2):
 	upload_path = sys.argv[1]
+	upload_name = ''
+elif(len(sys.argv) == 3):
+	upload_path = sys.argv[1]
+	upload_name = sys.argv[2]
+else:
+	print 'Usage: python s3_tool.py [local_path] [upload_name]'
+	exit(1)
 
 #Determine if path is a file or folder and if it exists
 if(os.path.isfile(upload_path)):
 	#if path is a file, upload to s3 with option to rename file/storage path
-	upload_name = raw_input('Enter upload name of file. (blank = original)')
+	if(len(sys.argv) <= 1):
+		upload_name = raw_input('Enter upload name of file. (blank = original)')
 	upload_target = path_leaf(upload_path)
 
 	if(upload_name == ''):
-		s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', 'songs/' + str(upload_target))
+		# s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', 'songs/' + str(upload_target))
+		s3.Object('cf-privatebucket01', 'songs/' + str(upload_target)).upload_file(Filename=str(upload_path))
 	else:
-		s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', 'songs/' + str(upload_name))
+		# s3.meta.client.upload_file(str(upload_path), 'cf-privatebucket01', 'songs/' + str(upload_name))
+		s3.Object('cf-privatebucket01', 'songs/' + str(upload_name)).upload_file(Filename=str(upload_path))
 
 elif(os.path.isdir(upload_path)):
 	#if path is a folder, upload all objects in folder to s3 with option to rename folder and/or storage path
-	upload_name = raw_input('Enter upload name of album/artist. (blank = original)')
+	if(len(sys.argv) <= 1):
+		upload_name = raw_input('Enter upload name of album/artist. (blank = original)')
 
 	rootTrigger = True;
 
@@ -67,9 +78,11 @@ elif(os.path.isdir(upload_path)):
 			rootTrigger = False
 		for file in files:
 			if(upload_name == ''):
-				s3.meta.client.upload_file(os.path.join(root, file), 'cf-privatebucket01', os.path.join(root[len(firstHeadName) + 1:], file))
+				#s3.meta.client.upload_file(os.path.join(root, file), 'cf-privatebucket01', os.path.join(root[len(firstHeadName) + 1:], file))
+				s3.Object('cf-privatebucket01', os.path.join(root[len(firstHeadName) + 1:], file)).upload_file(Filename=os.path.join(root, file))
 			else:
-				s3.meta.client.upload_file(os.path.join(root, file), 'cf-privatebucket01', str(upload_name + '/' + os.path.join(root[len(firstHeadName) + len(firstRootName) + 2:], file)))
+				#s3.meta.client.upload_file(os.path.join(root, file), 'cf-privatebucket01', str(upload_name + '/' + os.path.join(root[len(firstHeadName) + len(firstRootName) + 2:], file)))
+				s3.Object('cf-privatebucket01', str(upload_name + '/' + os.path.join(root[len(firstHeadName) + len(firstRootName) + 2:], file))).upload_file(Filename=os.path.join(root, file))
 else:
 	print('invalid path or file does not exist')
 
