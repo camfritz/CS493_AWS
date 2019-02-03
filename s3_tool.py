@@ -76,7 +76,10 @@ elif(os.path.isdir(upload_path)):
 			firstHeadName = path_head(root)
 			rootTrigger = False
 		for file in files:
-			print os.path.join(root[len(firstHeadName) + 1:], file)
+			if(upload_name == ''):
+				s3.meta.client.upload_file(os.path.join(root, file), 'cf-privatebucket01', os.path.join(root[len(firstHeadName) + 1:], file))
+			else:
+				s3.meta.client.upload_file(os.path.join(root, file), 'cf-privatebucket01', str(upload_name + '/' + os.path.join(root[len(firstHeadName) + len(firstRootName) + 2:], file)))
 else:
 	print('invalid path or file does not exist')
 
