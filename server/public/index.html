@@ -1,0 +1,52 @@
+<html>
+	<title>Test Page</title>
+	<head>
+		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+
+		<link rel="stylesheet" href="./css/styles.css">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="		sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="		sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<script>
+
+			$(document).ready(function() {
+				$.get("http://localhost:3000/", function(data, status) {
+					$("#AudioItem").attr("src", data[0].url);
+
+					var path = (data[0].key).split('/');
+					$("#Items").append(`<span>Artist: ${path[0]}</span><br>`)
+					$("#Items").append(`<span>Album: ${path[1]}</span><br>`)
+					$("#Items").append(`<span>Song: ${path[2]}</span><br>`)
+
+					// var obj = {};
+
+					// data.forEach(function(path) {
+					// 	(path.key).split('/').reduce(function(r, e) {
+					// 		if(e.includes('.mp3')) {
+					// 			return r[e] = path.url;
+					// 		}
+					// 		return r[e] || (r[e] = {})
+					// 	}, obj)
+					// })
+			});
+		});
+		</script>
+	</head>
+
+	<body>
+		<div class="row centered">
+			<div class="col-md-4" id="Items">
+				<audio id="AudioItem" src="" controls="controls"></audio>
+			</div>
+		</div>
+	</body>
+
+</html>

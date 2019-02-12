@@ -1,0 +1,24 @@
+.centered {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.card {
+	background-color: #5F5F5F;
+	padding: 20px;
+	color: black;
+	text-align: center;
+}
+
+.list-group-item {
+	margin: 10px;
+}
+
+.list-group {
+	max-height: 400px;
+	overflow-y: auto;
+}
