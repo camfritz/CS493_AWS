@@ -18,7 +18,7 @@
 		<script>
 
 			$(document).ready(function() {
-				$.get("http://localhost:3000/", function(data, status) {
+				$.get("http://3.86.118.204:3000/", function(data, status) {
 					$("#AudioItem").attr("src", data[0].url);
 
 					var path = (data[0].key).split('/');
