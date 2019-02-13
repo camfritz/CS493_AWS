@@ -1,0 +1,46 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Create EC2 instance",
+
+	"Resources" : {
+		"InstanceProfile" : {
+    	"Type" : "AWS::IAM::InstanceProfile",
+    	"Properties" : {
+      	"Path" : "/",
+      	"Roles" : ["EC2-S3FullAccess"]
+    		}
+  		},
+
+		"EC2Instance01" : {
+			"Type" : "AWS::EC2::Instance",
+			"Properties" : {
+				"KeyName" : "cf-ec2-keypair",
+				"ImageId" : "ami-0080e4c5bc078760e",
+				"InstanceType" : "t2.micro",
+				"IamInstanceProfile" : { "Ref" : "InstanceProfile" },
+				"UserData" : {
+					"Fn::Base64" : {
+						"Fn::Join" : [
+							"",
+							[
+								"#!/bin/bash -xe\n",
+								"sudo yum update -y\n",
+								"sudo yum install -y aws-cfn-bootstrap\n",
+								"sudo yum install -y cloud-init\n",
+								"sudo yum install -y git\n",
+								"curl --silent --location https://rpm.nodesource.com/setup_10.x | sudo bash - \n",
+								"sudo yum install -y nodejs\n",
+								"sudo git clone https://github.com/camfritz/CS493_AWS.git\n",
+								"sudo npm install express\n",
+								"sudo npm install path\n",
+								"sudo npm install aws-sdk\n",
+								"sudo npm install node-uuid\n",
+								"node /CS493_AWS/server/server.js\n"
+							]
+						]
+					}
+				}
+			}
+		}
+	}
+}
