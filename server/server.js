@@ -38,6 +38,27 @@ function artists_genre_ddb_params(genreName) {
  }
 }
 
+function albums_artist_ddb_params(artistName) {
+ return {
+ 	TableName: 'music',
+ 	IndexName: "artist_gsi",
+ 	ExpressionAttributeValues: {
+ 		":an": `${artistName}`,
+ 	},
+ 	KeyConditionExpression: "artist = :an"
+ }
+}
+
+function songs_album_ddb_params(albumName) {
+ return {
+ 	TableName: 'music',
+ 	ExpressionAttributeValues: {
+ 		":an": `${albumName}`
+ 	},
+ 	FilterExpression: "contains(artist_album_song, :an)"
+ }
+}
+
 var objects = [];
 
 app.get('/', function(req, res) {
@@ -59,6 +80,8 @@ app.get('/', function(req, res) {
 })
 
 app.get('/genres', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	ddb.scan(genre_ddb_params, function(err, data) {
 		if(err) {
 			console.log('ERROR: ' + err);
@@ -80,6 +103,8 @@ app.get('/genres', function(req, res) {
 })
 
 app.get('/artists/for/genre', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	var url = req.url;
 	url = (url.split('?')[1]).split('=')[1]
 
@@ -101,6 +126,79 @@ app.get('/artists/for/genre', function(req, res) {
 			res.send(resItems);
 		}
 	})
+})
+
+app.get('/albums/for/artist', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	var url = req.url;
+	url = (url.split('?')[1]).split('=')[1]
+
+	ddb.query(albums_artist_ddb_params(url), function(err, data) {
+		if(err) {
+			console.log('ERROR: ' + err);
+		}
+		else {
+			console.log('Scan succeeded');
+			var currentAlbum = ''
+			var resItems = []
+			data.Items.forEach(function(item) {
+				if(item.artist_album_song != currentAlbum) {
+					resItems.push(item.artist_album_song.split('#')[1])
+				}
+				currentArtist = item.artist_album_song;
+			})
+			console.log(resItems)
+			res.send(resItems);
+		}
+	})
+})
+
+app.get('/songs/for/album', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	var url = req.url;
+	url = (url.split('?')[1]).split('=')[1]
+
+	ddb.scan(songs_album_ddb_params(url), function(err, data) {
+		if(err) {
+			console.log('ERROR: ' + err);
+		}
+		else {
+			console.log('Scan succeeded');
+			var currentSong = ''
+			var resItems = []
+			data.Items.forEach(function(item) {
+				if(item.artist_album_song != currentSong) {
+					var AlbumTitle = item.artist_album_song.split('#')[1]
+					if(AlbumTitle == url) {
+						resItems.push(item.artist_album_song.split('#')[2])
+					}
+				}
+				currentSong = item.artist_album_song;
+			})
+			console.log(resItems)
+			res.send(resItems);
+		}
+	})
+})
+
+app.get('/song', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	var url = req.url;
+	url = (url.split('?')[1]).split('=')[1]
+
+	if(url == 'wonderwall') {
+		s3.listObjects(params, function(err, data) {
+		if(err) {
+			console.log('ERROR: ' + err);
+		}
+		else {
+			res.send('https://s3-us-west-2.amazonaws.com/cf-privatebucket01/' + data.Contents[0].Key)
+			}
+		})
+	}
 })
 
 app.listen(process.env.port || 3000);
