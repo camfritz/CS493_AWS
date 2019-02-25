@@ -10,9 +10,33 @@ var uuid = require('node-uuid');
 
 var s3 = new AWS.S3();
 
+var ddb = new AWS.DynamoDB.DocumentClient();
+
 var params = {
 	Bucket: "cf-privatebucket01"
  };
+
+ var genre_ddb_params = {
+ 	TableName: 'music',
+ 	ExpressionAttributeValues: {
+ 		":letter1": "A",
+ 		":letter2": "Z"
+ 	},
+ 	FilterExpression: "genre between :letter1 and :letter2"
+ }
+
+
+function artists_genre_ddb_params(genreName) {
+ return {
+ 	TableName: 'music',
+ 	ExpressionAttributeValues: {
+ 		":gn": `${genreName}`,
+ 		":letter1": "A",
+ 		":letter2": "Z"
+ 	},
+ 	FilterExpression: "genre = :gn and artist between :letter1 and :letter2"
+ }
+}
 
 var objects = [];
 
@@ -30,6 +54,51 @@ app.get('/', function(req, res) {
 			}
 			console.log(objects)
 			res.send(objects);
+		}
+	})
+})
+
+app.get('/genres', function(req, res) {
+	ddb.scan(genre_ddb_params, function(err, data) {
+		if(err) {
+			console.log('ERROR: ' + err);
+		}
+		else {
+			console.log('Scan succeeded');
+			var currentGenre = ''
+			var resItems = []
+			data.Items.forEach(function(item) {
+				if(item.genre != currentGenre) {
+					resItems.push(item.genre)
+				}
+				currentGenre = item.genre;
+			})
+			console.log(resItems)
+			res.send(resItems);
+		}
+	})
+})
+
+app.get('/artists/for/genre', function(req, res) {
+	var url = req.url;
+	url = (url.split('?')[1]).split('=')[1]
+
+	ddb.scan(artists_genre_ddb_params(url), function(err, data) {
+		if(err) {
+			console.log('ERROR: ' + err);
+		}
+		else {
+			console.log('Scan succeeded');
+			var currentArtist = ''
+			var resItems = []
+			data.Items.forEach(function(item) {
+				if(item.artist != currentArtist) {
+					resItems.push(item.artist)
+				}
+				currentArtist = item.artist;
+			})
+			console.log(resItems)
+			res.send(resItems);
 		}
 	})
 })
