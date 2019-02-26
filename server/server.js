@@ -20,7 +20,7 @@ var params = {
  	TableName: 'music',
  	ExpressionAttributeValues: {
  		":letter1": "A",
- 		":letter2": "Z"
+ 		":letter2": "z"
  	},
  	FilterExpression: "genre between :letter1 and :letter2"
  }
@@ -32,7 +32,7 @@ function artists_genre_ddb_params(genreName) {
  	ExpressionAttributeValues: {
  		":gn": `${genreName}`,
  		":letter1": "A",
- 		":letter2": "Z"
+ 		":letter2": "z"
  	},
  	FilterExpression: "genre = :gn and artist between :letter1 and :letter2"
  }
