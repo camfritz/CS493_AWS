@@ -222,7 +222,7 @@ app.post('/save-user', function(req, res) {
 		if(err) throw err;
 		else {
 			console.log(data);
-			res.send(200);
+			res.send('OK');
 		}
 	})
 })
