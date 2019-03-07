@@ -22,3 +22,7 @@
 	max-height: 400px;
 	overflow-y: auto;
 }
+
+.list_item {
+	font-size: 20px;
+}

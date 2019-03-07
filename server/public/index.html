@@ -2,6 +2,10 @@
 	<title>Test Page</title>
 	<head>
 		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+		<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+		<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+
+
 
 		<link rel="stylesheet" href="./css/styles.css">
 
@@ -15,18 +19,81 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
+		<script src="https://www.gstatic.com/firebasejs/5.8.5/firebase.js"></script>
+
+		<script>
+  		// Initialize Firebase
+  		var config = {
+    		apiKey: "AIzaSyDzp232w9Hw9Yq7skzFcD_py1qo3hHFuwQ",
+    		authDomain: "cs493-aws.firebaseapp.com",
+    		databaseURL: "https://cs493-aws.firebaseio.com",
+   		 	projectId: "cs493-aws",
+    		storageBucket: "",
+    		messagingSenderId: "692734195804"
+  		};
+  		firebase.initializeApp(config);
+		</script>
+
+		<script>
+			function googleSignInAuth() {
+				var provider = new firebase.auth.GoogleAuthProvider();
+
+				firebase.auth().signInWithPopup(provider)
+				.then(function(result) {
+					document.getElementById("content-container").style.visibility = "visible";
+						$.get("http://localhost:3000/genres", function(data, status) {
+							for(var i = 0; i < data.length; i++) {
+								$("#Items").append(`<a class="list_item" onclick="showArtists(event);">${data[i]}</a><br>`)
+							}
+						});
+
+						var user = result.user;
+						$.ajax({
+							type: "POST",
+							url: "http://localhost:3000/save-user",
+							data: {
+								id: user.uid,
+								name: user.displayName,
+								email: user.email
+							},
+							success: function() {
+								console.log("Success!");
+							}
+						})
+				})
+			}
+
+			function showArtists(e) {
+				$.get(`http://localhost:3000/artists/for/genre?genre=${e.target.innerHTML}`, function(data, status) {
+					$("#Items").empty();
+
+					for(var i = 0; i < data.length; i++) {
+						$("#Items").append(`<p class="list_item">${data[i]}</p><br>`)
+					}
+				})
+			}
+		</script>
+
 		<script>
 
 			$(document).ready(function() {
-				$.get("http://3.86.118.204:3000/", function(data, status) {
-					$("#AudioItem").attr("src", data[0].url);
+				document.getElementById("content-container").style.visibility = "hidden";
+				googleSignInAuth();
+		});
+		</script>
+	</head>
 
-					var path = (data[0].key).split('/');
-					$("#Items").append(`<span>Artist: ${path[0]}</span><br>`)
-					$("#Items").append(`<span>Album: ${path[1]}</span><br>`)
-					$("#Items").append(`<span>Song: ${path[2]}</span><br>`)
+	<body>
+		<div id="content-container" class="row centered">
+			<div class="col-md-4" id="Items">
+			</div>
+		</div>
+	</body>
 
-					// var obj = {};
+</html>
+
+<script>
+						// var obj = {};
 
 					// data.forEach(function(path) {
 					// 	(path.key).split('/').reduce(function(r, e) {
@@ -36,17 +103,6 @@
 					// 		return r[e] || (r[e] = {})
 					// 	}, obj)
 					// })
-			});
-		});
-		</script>
-	</head>
 
-	<body>
-		<div class="row centered">
-			<div class="col-md-4" id="Items">
-				<audio id="AudioItem" src="" controls="controls"></audio>
-			</div>
-		</div>
-	</body>
-
-</html>
+					//http://3.86.118.204:3000/
+</script>

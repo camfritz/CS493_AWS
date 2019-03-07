@@ -4,6 +4,12 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const router = express.Router();
+const bodyParser = require("body-parser");
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
 var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
@@ -199,6 +205,23 @@ app.get('/song', function(req, res) {
 			}
 		})
 	}
+})
+
+app.post('/save-user', function(req, res) {
+	console.log(req.body.id);
+	ddb.put({
+		TableName: 'users',
+		Item: {
+			'id': req.body.id,
+			'name': req.body.name,
+			'email': req.body.email
+		}
+	}, function(err, data) {
+		if(err) throw err;
+		else {
+			console.log(data);
+		}
+	})
 })
 
 app.listen(process.env.port || 3000);
