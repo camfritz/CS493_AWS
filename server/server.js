@@ -208,6 +208,8 @@ app.get('/song', function(req, res) {
 })
 
 app.post('/save-user', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	console.log(req.body.id);
 	ddb.put({
 		TableName: 'users',
@@ -220,6 +222,7 @@ app.post('/save-user', function(req, res) {
 		if(err) throw err;
 		else {
 			console.log(data);
+			res.send(200);
 		}
 	})
 })
