@@ -222,9 +222,9 @@ app.post('/save-user', function(req, res) {
 		if(err) throw err;
 		else {
 			console.log(data);
-			res.send('OK');
 		}
 	})
+	res.send('OK');
 })
 
 app.listen(process.env.port || 3000);
