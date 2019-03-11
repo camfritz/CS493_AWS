@@ -20,6 +20,7 @@ var s3 = new AWS.S3();
 var ddb = new AWS.DynamoDB.DocumentClient();
 
 var publisher = redis.createClient(6379, 'reporting.muemj7.ng.0001.use1.cache.amazonaws.com');
+var channel = 'reporting';
 
 publisher.on('connect', function() {
 	console.log('Redis client successfully connected..');
@@ -241,6 +242,11 @@ app.post('/save-user', function(req, res) {
 app.post('/play', function(req, res) {
 	res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  publisher.publish(channel, JSON.stringify({
+  	'artist': req.body.artist,
+  	'album': req.body.album,
+  	'song': req.body.song
+  }))
   res.send('OK');
 })
 

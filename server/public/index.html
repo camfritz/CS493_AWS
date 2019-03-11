@@ -35,6 +35,8 @@
 		</script>
 
 		<script>
+			var path;
+
 			function googleSignInAuth() {
 				var provider = new firebase.auth.GoogleAuthProvider();
 
@@ -50,7 +52,7 @@
 
 						$.get("http://3.86.118.204:3000/", function(data, status) {
 								$("#AudioItem").attr("src", data[0].url);
-								var path = (data[0].key).split('/');
+								path = (data[0].key).split('/');
 								$("#AudioItems").append(`<span>Artist: ${path[0]}</span><br>`)
 								$("#AudioItems").append(`<span>Album: ${path[1]}</span><br>`)
 								$("#AudioItems").append(`<span>Song: ${path[2]}</span><br>`)
@@ -82,13 +84,18 @@
 				})
 			}
 
-			function postElc() {
+			function publishToChannel() {
 				console.log("Attempting ELC...");
 				$.ajax({
 					type: "POST",
 					url: "http://3.86.118.204:3000/play",
+					data: {
+						artist: path[0],
+						album: path[1],
+						song: path[2]
+					}
 					success: function() {
-						console.log("Success with ELC!");
+						console.log("Successfully published!");
 					}
 				})
 			}
