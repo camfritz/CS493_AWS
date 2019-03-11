@@ -51,8 +51,8 @@
 
 
 						$.get("http://3.86.118.204:3000/", function(data, status) {
-								$("#AudioItem").attr("src", data[0].url);
-								path = (data[0].key).split('/');
+								$("#AudioItem").attr("src", data[2].url);
+								path = (data[2].key).split('/');
 								$("#AudioItems").append(`<span>Artist: ${path[0]}</span><br>`)
 								$("#AudioItems").append(`<span>Album: ${path[1]}</span><br>`)
 								$("#AudioItems").append(`<span>Song: ${path[2]}</span><br>`)
@@ -68,7 +68,7 @@
 								email: user.email
 							},
 							success: function() {
-								console.log("Success!");
+								console.log("User saved successfully!");
 							}
 						})
 				})
@@ -85,7 +85,6 @@
 			}
 
 			function publishToChannel() {
-				console.log("Attempting ELC...");
 				$.ajax({
 					type: "POST",
 					url: "http://3.86.118.204:3000/play",
@@ -93,7 +92,7 @@
 						artist: path[0],
 						album: path[1],
 						song: path[2]
-					}
+					},
 					success: function() {
 						console.log("Successfully published!");
 					}
@@ -106,6 +105,15 @@
 			$(document).ready(function() {
 				document.getElementById("content-container").style.visibility = "hidden";
 				googleSignInAuth();
+
+			$('#AudioItem').on("play", function(e) {
+				publishToChannel();
+			});
+
+			$('#AudioItem').on("ended", function(e) {
+				publishToChannel();
+			});
+
 		});
 		</script>
 	</head>
@@ -120,8 +128,6 @@
 			<div class="col-md-4" id="AudioItems">
 				<audio id="AudioItem" src="" controls="controls"></audio>
 			</div>
-
-			<button onclick="postElc()">ELC Test</button>
 	</body>
 
 </html>
