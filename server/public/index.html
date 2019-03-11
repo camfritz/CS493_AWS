@@ -47,6 +47,15 @@
 							}
 						});
 
+
+						$.get("http://3.86.118.204:3000/", function(data, status) {
+								$("#AudioItem").attr("src", data[0].url);
+								var path = (data[0].key).split('/');
+								$("#AudioItems").append(`<span>Artist: ${path[0]}</span><br>`)
+								$("#AudioItems").append(`<span>Album: ${path[1]}</span><br>`)
+								$("#AudioItems").append(`<span>Song: ${path[2]}</span><br>`)
+						})
+
 						var user = result.user;
 						$.ajax({
 							type: "POST",
@@ -72,6 +81,17 @@
 					}
 				})
 			}
+
+			function postElc() {
+				console.log("Attempting ELC...");
+				$.ajax({
+					type: "POST",
+					url: "http://3.86.118.204:3000/play",
+					success: function() {
+						console.log("Success with ELC!");
+					}
+				})
+			}
 		</script>
 
 		<script>
@@ -88,6 +108,13 @@
 			<div class="col-md-4" id="Items">
 			</div>
 		</div>
+
+		<div id="audio-container" class="row centered">
+			<div class="col-md-4" id="AudioItems">
+				<audio id="AudioItem" src="" controls="controls"></audio>
+			</div>
+
+			<button onclick="postElc()">ELC Test</button>
 	</body>
 
 </html>

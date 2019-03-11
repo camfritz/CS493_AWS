@@ -5,6 +5,7 @@ const app = express();
 const path = require('path');
 const router = express.Router();
 const bodyParser = require("body-parser");
+const redis = require('redis');
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -17,6 +18,16 @@ var uuid = require('node-uuid');
 var s3 = new AWS.S3();
 
 var ddb = new AWS.DynamoDB.DocumentClient();
+
+var publisher = redis.createClient(6379, 'reporting.muemj7.ng.0001.use1.cache.amazonaws.com');
+
+publisher.on('connect', function() {
+	console.log('Redis client successfully connected..');
+});
+
+publisher.on('error', function(err) {
+	console.log('Redis client failed to connect. Reason: ' + err);
+});
 
 var params = {
 	Bucket: "cf-privatebucket01"
@@ -225,6 +236,12 @@ app.post('/save-user', function(req, res) {
 		}
 	})
 	res.send('OK');
+})
+
+app.post('/play', function(req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.send('OK');
 })
 
 app.listen(process.env.port || 3000);
